@@ -1,7 +1,4 @@
-" =================================================================================
-" My tweaks for vim-orgmode
-
-luafile "./org.lua"
+lua require'org'
 
 let g:org_index = '~/Org/w.org'
 
@@ -20,12 +17,9 @@ highlight Folded guibg=bg
 setlocal foldmethod=expr
 setlocal foldexpr=MyOrgFold(v:lnum)
 
-"syntax clear org_bold
-"syntax clear org_italic
-"syntax clear org_underline
-"normal zM
+setlocal conceallevel=2 concealcursor=nc                                                                                                                                              
 
-command! Org :e ~/Org/w.org
+command! Org :execute ':e ' . g:org_index
 command! -nargs=1 OrgAck :execute 'Ack ' . <q-args> . ' ' . expand("%")
 command! OrgTodo :execute "Ack '(^[ \\t]*- \\[ ]|^\\*\+ TODO )' " . expand("%")
 command! OrgAgendaWeek :lua myOrgAgenda('7 days')
