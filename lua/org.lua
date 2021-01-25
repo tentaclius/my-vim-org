@@ -12,8 +12,45 @@ function maybe(...)
    return a
 end
 
+function tableFind(table, value)
+   for i, v in pairs(table) do
+      if v == value then
+         return i
+      end
+   end
+   return nil
+end
+
 function getline(lnum)
    return vim.api.nvim_buf_get_lines(0, lnum - 1, lnum, false)[1]
+end
+
+function setline(lnum, text)
+   return vim.api.nvim_buf_set_lines(0, lnum - 1, lnum, false, {text})
+end
+
+function mkheader(n, c)
+   h = ""
+   for i = 1, n do h = h .. c end
+   return h
+end
+
+function getIndent(line)
+   local ts = vim.api.nvim_buf_get_option(0, "ts")
+   local len = 0
+   local i = 1
+
+   while i <= line:len() and line:sub(i, i):match("[ \t]") do
+      if line:sub(i,i) == " " then
+         len = len + 1
+      else
+         len = len + ts
+      end
+
+      i = i + 1
+   end
+
+   return len
 end
 
 -----------------------------------------------------------------------------------------------------------------------
@@ -76,36 +113,38 @@ function myOrgAgenda(datestr)
    return foundHeaders
 end
 
+function myOrgHeaderLevel(lnum) --> header_level, header_line_number, header_line
+   for i = lnum, 1, -1 do
+      local line = getline(i)
+      if line:match("^[*]+ ") then
+         return line:match("^([*]+) "):len(), i, line
+      end
+   end
+   return nil
+end
+
+function myOrgFindNextHeader(lnum, hdrLevel) --> header_line, header_line_number
+   for i = lnum + 1, vim.api.nvim_buf_line_count(0) do
+      local line = getline(i)
+      if line:match("^[*]+ ") and line:match("^([*]+) "):len() <= hdrLevel then
+         return line, i - 1
+      end
+   end
+   return getline(vim.api.nvim_buf_line_count(0)), vim.api.nvim_buf_line_count(0)
+end
+
 -- Org Mode create next header of the same level
 function myOrgMkNextHeader()
    local lnum = vim.api.nvim_win_get_cursor(0)[1]
+   local hdrLevel = myOrgHeaderLevel(lnum)
+   local nextHdr, nextHdrLn = myOrgFindNextHeader(lnum, hdrLevel)
 
-   local hdrLevel = (function()
-      for i = lnum, 1, -1 do
-         local line = getline(i)
-         if line:match("^[*]+ ") then
-            return line:match("^([*]+) "):len()
-         end
-      end
-      return nil
-   end)()
+   --if not nextHdr:match("^[ \t]*$") and not getline(nextHdrLn):match("^[*]+ ") then
+   --   vim.api.nvim_call_function("append", {nextHdrLn, ""})
+   --   nextHdrLn = nextHdrLn + 1
+   --end
 
-   local nextHdr, nextHdrLn = (function()
-      for i = lnum + 1, vim.api.nvim_buf_line_count(0) do
-         local line = getline(i)
-         if line:match("^[*]+ ") and line:match("^([*]+) "):len() <= hdrLevel then
-            return line, i - 1
-         end
-      end
-      return getline(vim.api.nvim_buf_line_count(0)), vim.api.nvim_buf_line_count(0)
-   end)()
-
-   if not nextHdr:match("^[ \t]*$") and not getline(nextHdrLn):match("^[*]+ ") then
-      vim.api.nvim_call_function("append", {nextHdrLn, ""})
-      nextHdrLn = nextHdrLn + 1
-   end
-
-   vim.api.nvim_call_function("append", {nextHdrLn, header(hdrLevel, "*") .. " "})
+   vim.api.nvim_call_function("append", {nextHdrLn, mkheader(hdrLevel, "*") .. " "})
    vim.api.nvim_win_set_cursor(0, {nextHdrLn + 1, 1})
    vim.api.nvim_feedkeys("A", "m", false)
 end
@@ -129,3 +168,87 @@ function myOrgFold(lnum)
    return "="
 end
 
+-- Promote/demote a single line
+function myOrgPromoteLine(lnum, n)
+   local sw = vim.api.nvim_buf_get_option(0, "shiftwidth")
+   local line = getline(lnum)
+
+   if line:match("^[*]+ ") then
+      return setline(lnum, n > 0 and ("*" .. line) or line:sub(2))
+   else
+      if n > 0 then
+         setline(lnum, mkheader(sw, " ") .. line)
+      else
+         setline(lnum, n > 0 and (mkheader(sw, " ") .. line) or line:sub(math.min(getIndent(line), sw) + 1))
+      end
+   end
+end
+
+-- Promote/demote branch
+function myOrgPromoteBranch(n)
+   local lnum = vim.api.nvim_win_get_cursor(0)[1]
+   local hdrLevel, startLn = myOrgHeaderLevel(lnum)
+   local ts = vim.api.nvim_buf_get_option(0, "ts")
+   local nextHdr, endLn = myOrgFindNextHeader(lnum, hdrLevel)
+   if not hdrLevel or not startLn or not endLn then return nil end
+
+   for i = startLn, endLn do
+      local line = getline(i)
+      if line:match("^[*]+ ") then
+         setline(i, n > 0 and ("*" .. line) or line:sub(2))
+      end
+   end
+end
+
+-- Re-indent a line
+function myOrgIndentLine(lnum)
+   local line = getline(lnum)
+
+   local hdrLevel, hdrLnum, hdrLine = myOrgHeaderLevel(lnum)
+
+   if hdrLevel and not line:match("^[*]+ ") then
+      setline(lnum, mkheader(hdrLevel + 1, " ") .. line:match("^[ \t]*(.*)$"))
+   end
+end
+
+-- Toggle ToDo item
+function myOrgToggleTodo()
+   local states = {"TODO", "DONE"}
+   local lnum = vim.api.nvim_win_get_cursor(0)[1]
+   local line = getline(lnum)
+   local si = nil
+
+   if line:match("^[*]+ %w+") then
+      local state = line:match("^[*]+ (%w+)")
+      si = tableFind(states, state)
+      if not si then si = 0 end
+      si = si + 1
+      if si > #states then si = nil end
+   else
+      si = 1
+   end
+
+   local headerStar = line:match("^([*]+)")
+   local headerTxt = (si == 1) and line:match("^[*]+(.*)$") or line:match("^[*]+ %w+(.*)$")
+
+   setline(lnum, headerStar .. (not si and "" or " " .. states[si]) .. headerTxt)
+end
+
+-- Go to the parent header
+function myOrgGoToParent()
+   local lnum = vim.api.nvim_win_get_cursor(0)[1]
+   local hdrLevel, hdrLnum, hdrLine = myOrgHeaderLevel(lnum)
+
+   if hdrLnum ~= lnum then
+      vim.api.nvim_win_set_cursor(0, {hdrLnum, 1})
+      return
+   end
+   
+   for i = hdrLnum - 1, 1, -1 do
+      local line = getline(i)
+      if line:match("^[*]+ ") and line:match("^([*]+) "):len() < hdrLevel then
+         vim.api.nvim_win_set_cursor(0, {i, 1})
+         return
+      end
+   end
+end
