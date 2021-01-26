@@ -22,11 +22,15 @@ highlight org_shadow_star guifg=bg gui=bold
 syntax keyword org_todo TODO DONE contained
 highlight org_todo guifg=#ffffff
 
-" Text effects
+" Text effects (bold)
 syn match org_bold /\_W\*\w.*\w\*\_W/hs=s+1,he=e-1 contains=org_bold_star1,org_bold_star2
 syn match org_bold_star1 /\_W\*\w/hs=s+1,he=e-1 contained conceal
 syn match org_bold_star2 /\w\*\_W/hs=s+1,he=e-1 contained conceal
 highlight org_bold guibg=#ffffff guifg=#000000
+
+" Code block (MD-style)
+syn region org_code start=/```/ end=/```/
+highlight def link org_code String
 
 " Timestamps
 syntax match org_timestamp /<\d\{4}-\d\{2}-\d\{2}>/
@@ -40,4 +44,5 @@ syntax match hyperlink	"\[\{2}[^][]*\(\]\[[^][]*\)\?\]\{2}" contains=hyperlinkBr
 syntax match hyperlinkBracketsLeft	contained "\[\{2}"     conceal
 syntax match hyperlinkURL				    contained "[^][]*\]\[" conceal
 syntax match hyperlinkBracketsRight	contained "\]\{2}"     conceal
+syntax match hyperlink /https\?:\/\/[A-Za-z0-9.-_:/%]\+/
 hi def link hyperlink Underlined
