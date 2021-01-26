@@ -22,8 +22,17 @@ highlight org_shadow_star guifg=bg gui=bold
 syntax keyword org_todo TODO DONE contained
 highlight org_todo guifg=#ffffff
 
+" Text effects
+syn match org_bold /\_W\*\w.*\w\*\_W/hs=s+1,he=e-1 contains=org_bold_star1,org_bold_star2
+syn match org_bold_star1 /\_W\*\w/hs=s+1,he=e-1 contained conceal
+syn match org_bold_star2 /\w\*\_W/hs=s+1,he=e-1 contained conceal
+highlight org_bold guibg=#ffffff guifg=#000000
+
 " Timestamps
 syntax match org_timestamp /<\d\{4}-\d\{2}-\d\{2}>/
+syntax match org_timestamp /<\d\{4}-\d\{2}-\d\{2} \d\{2}:\d\{2}>/
+syntax match org_timestamp /<\d\{4}-\d\{2}-\d\{2} [A-Za-z]\{3}>/
+syntax match org_timestamp /<\d\{4}-\d\{2}-\d\{2} [A-Za-z]\{3} \d\{2}:\d\{2}>/
 highlight org_timestamp guifg=#ffffff
 
 " Links
