@@ -1,0 +1,36 @@
+* Test
+  Hello World
+** Test
+   how are you today
+*** Test
+    This plugin is at a usable stage now, but there are lot of rough edges.
+    At the moment it is not really ready for publish, rather a personal quick set up to comfortably work with org-mode
+    files.
+
+* Some features
+  - Syntax highlighting
+    - headers
+    - links
+    - Markdown style code blocks
+    - Bold font
+    - Dates
+    - Tags
+    - ToDo
+  - Folding
+  - Headers promotion/demotion
+  - Headers hopping
+  - Agenda
+  - ToDo cycle
+
+* Hotkeys
+  - *<C-j>* create next header of the same level
+  - *>>* promote line
+  - *<<* demote line
+  - *==* indent current line
+  - *<leader> >* promote branch
+  - *<leader> <* demote branch
+  - *]]* next header
+  - *[[* previous header
+  - *<leader>t* toggle ToDo
+  - *<BS>* jump to the parent header
+  - *<CR>* follow a link in this line
