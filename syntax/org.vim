@@ -27,7 +27,7 @@ syntax match org_tag /:[A-Za-z0-9_:]*:\s*$/
 highlight def link org_tag Label
 
 " Text effects (bold)
-syn match org_bold /\_W\*\w.*\w\*\_W/hs=s+1,he=e-1 contains=org_bold_star1,org_bold_star2
+syn match org_bold /\_W\*\S.*\S\*\_W/hs=s+1,he=e-1 contains=org_bold_star1,org_bold_star2
 syn match org_bold_star1 /\_W\*\w/hs=s+1,he=e-1 contained conceal
 syn match org_bold_star2 /\w\*\_W/hs=s+1,he=e-1 contained conceal
 highlight org_bold guibg=#ffffff guifg=#000000

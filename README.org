@@ -33,4 +33,4 @@
   - *[[* previous header
   - *<leader>t* toggle ToDo
   - *<BS>* jump to the parent header
-  - *<CR>* follow a link in this line
+  - *gl* follow a link in this line

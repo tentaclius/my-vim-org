@@ -258,7 +258,7 @@ function myOrgFollowLink()
    local lnum = vim.api.nvim_win_get_cursor(0)[1]
    local line = getline(lnum)
 
-   local link = line:match("[[][[](.*)][[].*]]") or line:match("[[][[](.*)]]")
+   local link = line:match("[[][[](.*)][[].*]]") or line:match("[[][[](.*)]]") or line:match("(https?://[^ \t]*)")
    if link then
       os.execute('gio open "' .. link .. '" >/dev/null &')
    end

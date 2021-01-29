@@ -59,4 +59,4 @@ nnoremap ]] :call MyOrgNextHeader()<CR>
 nnoremap [[ :call MyOrgPrevHeader()<CR>
 nnoremap <leader>t :lua myOrgToggleTodo()<CR>
 nnoremap <BS> :lua myOrgGoToParent()<CR>
-nnoremap <CR> :lua myOrgFollowLink()<CR>
+nnoremap gl :lua myOrgFollowLink()<CR>
