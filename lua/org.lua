@@ -71,6 +71,16 @@ function myOrgFoldtext(lnum)
    return getline(lnum):sub(1, 80) .. "..."
 end
 
+function orgParseDate(line)
+   local y, m, d, t, i = line:match("<(%d+)-(%d+)-(%d+) [ A-Za-z]*([0-9:]+) ([0-9dwmy+]+)")
+   if not y then y, m, d, i = line:match("<(%d+)-(%d+)-(%d+) [ A-Za-z]*([0-9dwmy+]+)") end
+   if not y then y, m, d, t = line:match("<(%d+)-(%d+)-(%d+)[ A-Za-z]* [0-9:]+-([0-9:]+)[ 0-9A-Za-z+]*>") end
+   if not y then y, m, d, t = line:match("<(%d+)-(%d+)-(%d+)[ A-Za-z]* ([0-9:]+)[ 0-9A-Za-z+]*>") end
+   if not y then y, m, d = line:match("<(%d+)-(%d+)-(%d+)[ 0-9A-Za-z+]*>") end
+
+   return y, m, d, t, i
+end
+
 -- OrgMode find Agenda for the following week in the current buffer
 function myOrgAgenda(datestr)
    local bufnr = vim.api.nvim_call_function('bufnr', {'%'})
@@ -93,9 +103,7 @@ function myOrgAgenda(datestr)
          lastHeaderTxt = line
       end
 
-      local y, m, d, t = line:match("<(%d+)-(%d+)-(%d+)[ A-Za-z]* [0-9:]+-([0-9:]+)[ 0-9A-Za-z+]*>")
-      if not y then y, m, d, t = line:match("<(%d+)-(%d+)-(%d+)[ A-Za-z]* ([0-9:]+)[ 0-9A-Za-z+]*>") end
-      if not y then y, m, d = line:match("<(%d+)-(%d+)-(%d+)[ 0-9A-Za-z+]*>") end
+      local y, m, d, t, i = orgParseDate(line)
 
       if y then
          local sched = ("%04d-%02d-%02d %s"):format(y, m, d, t or "")
@@ -251,4 +259,47 @@ function myOrgGoToParent()
          return
       end
    end
+end
+
+-- Postpone periodic todo
+function myOrgPostponeTodo()
+   local lnum = vim.api.nvim_win_get_cursor(0)[1]
+   local hdrLevel, hdrLnum, hdrLine = myOrgHeaderLevel(lnum)
+   local nxtHdr, nxtHdrLn = myOrgFindNextHeader(lnum, hdrLevel)
+   local y, m, d, t, inc
+   local dtLn
+
+   maybe(
+      function()
+         -- find the line with the date
+         for i = hdrLnum, nxtHdrLn do
+            y, m, d, t, inc = orgParseDate(getline(i))
+            dtLn = i
+            if inc then return inc end
+         end
+      end,
+      function(i)
+         -- parse the increment
+         local n, u = i:match("[+](%d+)([dwmy])")
+         if n then return {num = tonumber(n), unit = u} end
+      end,
+      function(incr)
+         -- translate the inrement suffix to the unit the `date` understands
+         incr.unit = ({y="year", m="month", w="week", d="day"})[incr.unit]
+         return incr
+      end,
+      function(incr)
+         -- generate a new date using `date` cmd
+         local dt = string.format("%s-%s-%s %s", y, m, d, (t and t or ""))
+         local cmd = "date +'%Y-%m-%d " .. (t and "%H:%M:%S" or "") .. "' -d '" .. dt .. ' ' ..
+            tostring(incr.num) .. ' ' .. incr.unit .. "'"
+         local handle = io.popen(cmd)
+         return handle:read("*a")
+      end,
+      function(dt)
+         -- replace the old date with the new one
+         return getline(dtLn):gsub("<[ A-Za-z0-9:+-]+>", "<" .. dt .. ' ' .. inc .. ">"):gsub("\n", "")
+      end,
+      function(ln) setline(dtLn, ln) end
+   )
 end

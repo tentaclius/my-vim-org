@@ -58,4 +58,5 @@ nnoremap <leader>< :lua myOrgPromoteBranch(-1)<CR>
 nnoremap ]] :call MyOrgNextHeader()<CR>
 nnoremap [[ :call MyOrgPrevHeader()<CR>
 nnoremap <leader>t :lua myOrgToggleTodo()<CR>
+nnoremap <leader>r :lua myOrgPostponeTodo()<CR>
 nnoremap <BS> :lua myOrgGoToParent()<CR>
