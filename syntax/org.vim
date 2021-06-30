@@ -5,24 +5,28 @@
 "highlight org_bold guibg=#ffffff guifg=#000000
 
 " Headers
-syntax match org_hx /^\*\+ [^:]*/ contains=org_shadow_star,org_todo
+syntax match org_hx /^\*\+ [^:]*/ contains=org_shadow_star,org_state_todo,org_state_done,org_state_conc
 highlight org_hx guifg=white gui=bold
-syntax match org_h1 /^\* [^:]*/ contains=org_shadow_star,org_todo
+syntax match org_h1 /^\* [^:]*/ contains=org_shadow_star,org_state_todo,org_state_done,org_state_canc
 highlight org_h1 guifg=#b0e141 gui=bold
-syntax match org_h2 /^\*\{2} [^:]*/ contains=org_shadow_star,org_todo
+syntax match org_h2 /^\*\{2} [^:]*/ contains=org_shadow_star,org_state_todo,org_state_done,org_state_canc
 highlight org_h2 guifg=#c5e372 gui=bold
-syntax match org_h3 /^\*\{3} [^:]*/ contains=org_shadow_star,org_todo
+syntax match org_h3 /^\*\{3} [^:]*/ contains=org_shadow_star,org_state_todo,org_state_done,org_state_canc
 highlight org_h3 guifg=#00a9e2 gui=bold
-syntax match org_h4 /^\*\{4} [^:]*/ contains=org_shadow_star,org_todo
+syntax match org_h4 /^\*\{4} [^:]*/ contains=org_shadow_star,org_state_todo,org_state_done,org_state_canc
 highlight org_h4 guifg=#8ce2ff gui=bold
-syntax match org_h5 /^\*\{5} [^:]*/ contains=org_shadow_star,org_todo
+syntax match org_h5 /^\*\{5} [^:]*/ contains=org_shadow_star,org_state_todo,org_state_done,org_state_canc
 highlight org_h5 guifg=#d575c6 gui=bold
-syntax match org_h6 /^\*\{6} [^:]*/ contains=org_shadow_star,org_todo
+syntax match org_h6 /^\*\{6} [^:]*/ contains=org_shadow_star,org_state_todo,org_state_done,org_state_canc
 highlight org_h6 guifg=#d3b6e7 gui=bold
 syntax match org_shadow_star /^\*\+\* /me=e-2 contained
 highlight org_shadow_star guifg=bg gui=bold
-syntax keyword org_todo TODO DONE CANCELLED contained
-highlight org_todo guifg=#ffffff
+syntax keyword org_state_todo TODO contained
+syntax keyword org_state_done DONE contained
+syntax keyword org_state_canc CANCELLED contained
+highlight org_state_todo guifg=white gui=bold
+highlight org_state_done guifg=green gui=bold
+highlight org_state_canc guifg=red gui=bold
 
 " Tags
 syntax match org_tag /:[A-Za-z0-9_:]*:\s*$/
