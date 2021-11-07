@@ -1,4 +1,4 @@
-* Test
+* Description
     This plugin is at a usable stage now, but there are lot of rough edges.
     At the moment it is not really ready for publishing, rather a personal quick set up to comfortably work with org-mode
     files.
