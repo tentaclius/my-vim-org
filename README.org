@@ -1,10 +1,6 @@
 * Test
-  Hello World
-** Test
-   how are you today
-*** Test
     This plugin is at a usable stage now, but there are lot of rough edges.
-    At the moment it is not really ready for publish, rather a personal quick set up to comfortably work with org-mode
+    At the moment it is not really ready for publishing, rather a personal quick set up to comfortably work with org-mode
     files.
 
 * Some features
@@ -19,10 +15,11 @@
   - Folding
   - Headers promotion/demotion
   - Headers hopping
-  - Agenda
-  - ToDo cycle
+  - Some agenda functions
+  - ToDo state cycle
 
 * Hotkeys
+  - standard folding hot-keys, *<z-o>*, *<z-c>*, *<z-R>* etc
   - *<C-j>* create next header of the same level
   - *>>* promote line
   - *<<* demote line
