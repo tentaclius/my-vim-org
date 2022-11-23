@@ -48,16 +48,16 @@ command! OrgAgendaToday :lua myOrgAgenda('today')
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Key Mappings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-nnoremap <C-j> :lua myOrgMkNextHeader()<CR>
-inoremap <C-j> :lua myOrgMkNextHeader()<CR>
-nnoremap >> :call luaeval('myOrgPromoteLine(' . line(".") . ',1)')<CR>
-nnoremap << :call luaeval('myOrgPromoteLine(' . line(".") . ',-1)')<CR>
-nnoremap == :call luaeval('myOrgIndentLine(' . line(".") . ')')<CR>
-nnoremap <leader>> :lua myOrgPromoteBranch(1)<CR>
-nnoremap <leader>< :lua myOrgPromoteBranch(-1)<CR>
-nnoremap ]] :call MyOrgNextHeader()<CR>
-nnoremap [[ :call MyOrgPrevHeader()<CR>
-nnoremap <leader>t :lua myOrgToggleTodo()<CR>
-nnoremap <leader>r :lua myOrgPostponeTodo()<CR>
-nnoremap <BS> :lua myOrgGoToParent()<CR>
-nnoremap gl :lua myOrgFollowLink()<CR>
+nnoremap <buffer> <C-j> :lua myOrgMkNextHeader()<CR>
+inoremap <buffer> <C-j> :lua myOrgMkNextHeader()<CR>
+nnoremap <buffer> >> :call luaeval('myOrgPromoteLine(' . line(".") . ',1)')<CR>
+nnoremap <buffer> << :call luaeval('myOrgPromoteLine(' . line(".") . ',-1)')<CR>
+nnoremap <buffer> == :call luaeval('myOrgIndentLine(' . line(".") . ')')<CR>
+nnoremap <buffer> <leader>> :lua myOrgPromoteBranch(1)<CR>
+nnoremap <buffer> <leader>< :lua myOrgPromoteBranch(-1)<CR>
+nnoremap <buffer> ]] :call MyOrgNextHeader()<CR>
+nnoremap <buffer> [[ :call MyOrgPrevHeader()<CR>
+nnoremap <buffer> <leader>t :lua myOrgToggleTodo()<CR>
+nnoremap <buffer> <leader>r :lua myOrgPostponeTodo()<CR>
+nnoremap <buffer> <BS> :lua myOrgGoToParent()<CR>
+nnoremap <buffer> gl :lua myOrgFollowLink()<CR>
